@@ -90,6 +90,7 @@ def insert_into_db(cities: List[City]) -> None:
 
     sql_create_table: str = """
     CREATE TABLE IF NOT EXISTS cities (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         description TEXT,
         lat REAL,
@@ -102,13 +103,12 @@ def insert_into_db(cities: List[City]) -> None:
     VALUES (?, ?, ?, ?)
     """
 
-    sql_add_index: str = "CREATE INDEX idx_column_name ON your_table(column_name);"
+    sql_add_index: str = "CREATE INDEX idx_column_name ON cities(name);"
 
     query: dict[str, list[dict]] = {
         "requests": [
             {"type": "execute", "stmt": {"sql": sql_delete_table}},
             {"type": "execute", "stmt": {"sql": sql_create_table}},
-            {"type": "execute", "stmt": {"sql": sql_add_index}},
             *[
                 {
                     "type": "execute",
@@ -136,6 +136,7 @@ def insert_into_db(cities: List[City]) -> None:
                 }
                 for city in cities
             ],
+            {"type": "execute", "stmt": {"sql": sql_add_index}},
             {"type": "close"},
         ]
     }
