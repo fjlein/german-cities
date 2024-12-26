@@ -1,11 +1,12 @@
 import { turso } from '$lib/turso';
-import { json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url }) => {
-	const prefix = url.searchParams.get('p');
-	const infix = url.searchParams.get('i');
-	const suffix = url.searchParams.get('s');
+	const prefix = url.searchParams.get('prefix');
+	const infix = url.searchParams.get('infix');
+	const suffix = url.searchParams.get('suffix');
+	let limit = url.searchParams.get('limit');
 
 	const conditions: string[] = [];
 	const params: string[] = [];
@@ -36,12 +37,26 @@ export const GET: RequestHandler = async ({ url }) => {
 		query += ` AND (${conditions.join(' AND ')})`;
 	}
 
-	const { rows } = await turso.execute({
-		sql: query,
-		args: params
-	});
+	if (!limit) {
+		limit = '10000';
+	}
 
-	const cities: City[] = rows as unknown as City[];
+	query += ` LIMIT ${limit}`;
+
+	const result = await turso.batch([
+		{
+			sql: query,
+			args: params
+		},
+		'SELECT COUNT(name) FROM cities'
+	]);
+
+	const city_rows = result[0].rows;
+	const count_rows = result[1].rows;
+
+	console.log(count_rows);
+
+	const cities: City[] = city_rows as unknown as City[];
 
 	return json(cities);
 };

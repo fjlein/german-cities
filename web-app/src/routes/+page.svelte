@@ -3,19 +3,59 @@
 	import type { PageData } from './$types';
 	import L from 'leaflet';
 	import 'leaflet/dist/leaflet.css';
+	import salesman from 'salesman.js';
+	import Footer from '$lib/components/footer.svelte';
+	import Search from '$lib/components/search.svelte';
+	import Header from '$lib/components/header.svelte';
 
 	let { data }: { data: PageData } = $props();
 
 	let map: L.Map;
 	let mapElement: HTMLElement;
 
-	let cities: City[] = data.cities;
+	let cities: City[] = $derived.by(() => {
+		let state = $state(data.cities);
+		return state;
+	});
+
 	let polyline: L.LatLngExpression[];
 
+	let markerGroup: L.LayerGroup = L.layerGroup();
+
+	let markers: L.Marker[] = $derived.by(() => {
+		let m = [];
+		for (const city of cities) {
+			const marker = L.marker([city.lat, city.lon]);
+			marker.bindPopup(city.name);
+			m.push(marker);
+		}
+		return m;
+	});
+
+	function addMarkers() {
+		console.log('markers added');
+		map.removeLayer(markerGroup);
+		markerGroup = L.layerGroup(markers.slice(0, 100));
+		map.addLayer(markerGroup);
+	}
+
+	$effect(() => {
+		markers;
+		if (map) {
+			addMarkers();
+		}
+	});
+
 	onMount(() => {
+		initMap();
+		addMarkers();
+	});
+
+	function initMap() {
 		map = L.map(mapElement, {
 			center: [51.558, 10.141],
-			zoom: 6.2
+			zoom: 6.2,
+			dragging: !L.Browser.mobile
 		}).addLayer(
 			L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 				// maxZoom: 10,
@@ -23,38 +63,37 @@
 				attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 			})
 		);
+	}
 
-		cities.forEach((city) => {
-			const marker = L.marker([city.lat, city.lon]);
-			marker.bindPopup(city.name);
-			marker.addTo(map);
-		});
+	// async function calculateAndAddPolyline() {
+	// 	await new Promise((resolve) => setTimeout(resolve, 1000));
 
-		// const points: salesman.Point[] = cities.map((city) => {
-		// 	return new salesman.Point(city.lat, city.lon);
-		// });
+	// 	const points: salesman.Point[] = cities.map((city) => {
+	// 		return new salesman.Point(city.lat, city.lon);
+	// 	});
 
-		// const solution: number[] = salesman.solve(points, 0.999999, co);
-		// const ordered_points: salesman.Point[] = solution.map((i) => points[i]);
+	// 	const solution: number[] = await new Promise<number[]>((resolve) =>
+	// 		setTimeout(() => resolve(salesman.solve(points, 0.999)), 0)
+	// 	);
 
-		// const paths = ordered_points.map((point, index) => {
-		// 	const nextPoint = ordered_points[(index + 1) % ordered_points.length]; // Wrap around to the first point
-		// 	return {
-		// 		from: { x: point.x, y: point.y },
-		// 		to: { x: nextPoint.x, y: nextPoint.y }
-		// 	};
-		// });
+	// 	polyline = solution.map((i) => [points[i].x, points[i].y]);
 
-		// console.log(paths);
-
-		// paths.forEach((path) => {
-		// 	console.log(path);
-		// 	L.polyline([
-		// 		[path.from.x, path.from.y],
-		// 		[path.to.x, path.to.y]
-		// 	]).addTo(map);
-		// });
-	});
+	// 	L.polyline(polyline).addTo(map);
+	// }
 </script>
 
-<div class="h-[600px] w-[500px]" bind:this={mapElement}></div>
+<!-- {JSON.stringify(cities)} -->
+
+<Search />
+<div class="h-6"></div>
+<Header {data}></Header>
+<div class="h-6"></div>
+<div class="h-[650px] w-full" bind:this={mapElement}></div>
+<div class="h-6"></div>
+<div class="flex flex-wrap gap-2">
+	{#each cities as city}
+		<div class="rounded-md bg-blue-100 px-2 py-1 text-2xl font-medium">{city.name}</div>
+	{/each}
+</div>
+<div class="h-24"></div>
+<Footer />

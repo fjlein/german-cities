@@ -3,14 +3,21 @@ import type { PageLoad } from './$types';
 export const ssr = false;
 
 export const load = (async ({ url, fetch }) => {
-	const p = url.searchParams.get('p') ?? '';
-	const i = url.searchParams.get('i') ?? '';
-	const s = url.searchParams.get('s') ?? '';
+	const prefix = url.searchParams.get('prefix') ?? '';
+	const infix = url.searchParams.get('infix') ?? '';
+	const suffix = url.searchParams.get('suffix') ?? '';
+	let limit = url.searchParams.get('limit') ?? '';
 
-	console.log(`/api/cities?p=${p}&i=${i}&s=${s}`);
+	if (limit && !Number.isInteger(Number(limit))) {
+		limit = '';
+	}
 
-	const res = await fetch(`/api/cities?p=${p}&i=${i}&s=${s}`);
+	const res = await fetch(
+		`/api/cities?prefix=${prefix}&infix=${infix}&suffix=${suffix}&limit=${limit}`
+	);
 	const cities: City[] = await res.json();
 
-	return { p, i, s, cities };
+	console.log('Jo' + cities.length + url);
+
+	return { prefix, infix, suffix, cities };
 }) satisfies PageLoad;
