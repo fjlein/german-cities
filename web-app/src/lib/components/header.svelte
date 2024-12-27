@@ -102,7 +102,7 @@
 				<img src={sad} class="inline-block h-9" alt="sad face" />
 			{/if}
 
-			{data.cities.length} of {data.coordinate_count} german cit{data.cities.length == 1
+			{data.cities.length} out of {data.coordinate_count} german cit{data.cities.length == 1
 				? 'y'
 				: 'ies'}
 
