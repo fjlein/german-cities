@@ -3,9 +3,7 @@
 	import type { PageData } from './$types';
 	import L from 'leaflet';
 	import 'leaflet/dist/leaflet.css';
-	import salesman from 'salesman.js';
 	import Footer from '$lib/components/footer.svelte';
-	import Search from '$lib/components/search.svelte';
 	import Header from '$lib/components/header.svelte';
 
 	let { data }: { data: PageData } = $props();
@@ -33,7 +31,6 @@
 	});
 
 	function addMarkers() {
-		console.log('markers added');
 		map.removeLayer(markerGroup);
 		markerGroup = L.layerGroup(markers.slice(0, 100));
 		map.addLayer(markerGroup);
@@ -45,7 +42,6 @@
 			addMarkers();
 		}
 	});
-
 	onMount(() => {
 		initMap();
 		addMarkers();
@@ -57,10 +53,11 @@
 			zoom: 6.2,
 			dragging: !L.Browser.mobile
 		}).addLayer(
-			L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
 				// maxZoom: 10,
 				minZoom: 5,
-				attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+				attribution:
+					'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
 			})
 		);
 	}
@@ -84,16 +81,16 @@
 
 <!-- {JSON.stringify(cities)} -->
 
-<Search />
-<div class="h-6"></div>
 <Header {data}></Header>
-<div class="h-6"></div>
-<div class="h-[650px] w-full" bind:this={mapElement}></div>
-<div class="h-6"></div>
-<div class="flex flex-wrap gap-2">
-	{#each cities as city}
-		<div class="rounded-md bg-blue-100 px-2 py-1 text-2xl font-medium">{city.name}</div>
-	{/each}
+<div class="h-3"></div>
+
+<div class="aspect-[4/5] w-full rounded-xl" bind:this={mapElement}></div>
+
+<div class="h-3"></div>
+<div class="">
+	<p class="text-3xl">
+		{cities.map(({ name }) => name).join(', ')}
+	</p>
 </div>
 <div class="h-24"></div>
 <Footer />

@@ -40,8 +40,10 @@
 		@apply bg-background text-foreground;
 	}
 
-	a {
-		@apply underline underline-offset-4;
+	@font-face {
+		font-family: 'Overused-Grotesk';
+		font-style: normal;
+		src: url(/fonts/OverusedGrotesk-Medium.woff2) format('woff2');
 	}
 }
 /* 

@@ -3,6 +3,8 @@ import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url }) => {
+	console.log('API called');
+
 	const prefix = url.searchParams.get('prefix');
 	const infix = url.searchParams.get('infix');
 	const suffix = url.searchParams.get('suffix');
@@ -48,15 +50,18 @@ export const GET: RequestHandler = async ({ url }) => {
 			sql: query,
 			args: params
 		},
-		'SELECT COUNT(name) FROM cities'
+		'SELECT COUNT(name) FROM cities',
+		'SELECT COUNT(name) FROM cities WHERE lat IS NOT NULL AND lon IS NOT NULL'
 	]);
 
 	const city_rows = result[0].rows;
-	const count_rows = result[1].rows;
+	const full_count_rows = result[1].rows;
+	const coordinate_count_rows = result[2].rows;
 
-	console.log(count_rows);
+	const full_count: number = full_count_rows[0]['COUNT(name)'] as unknown as number;
+	const coordinate_count: number = coordinate_count_rows[0]['COUNT(name)'] as unknown as number;
 
 	const cities: City[] = city_rows as unknown as City[];
 
-	return json(cities);
+	return json({ cities, full_count, coordinate_count });
 };
