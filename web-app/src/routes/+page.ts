@@ -8,12 +8,7 @@ export const load = (async ({ url, parent }) => {
 	const prefix = url.searchParams.get('prefix') ?? '';
 	const infix = url.searchParams.get('infix') ?? '';
 	const suffix = url.searchParams.get('suffix') ?? '';
-	let limit = url.searchParams.get('limit') ?? '';
-	let search = url.searchParams.get('search');
-
-	if (limit && !Number.isInteger(Number(limit))) {
-		limit = '';
-	}
+	const search = url.searchParams.get('search');
 
 	const filtered_cities: City[] = cities.filter((city) => {
 		const name = city.name.toLowerCase();

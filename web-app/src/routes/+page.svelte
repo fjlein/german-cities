@@ -23,8 +23,15 @@
 	let markers: L.Marker[] = $derived.by(() => {
 		let m = [];
 		for (const city of cities) {
-			const marker = L.marker([city.lat, city.lon]);
-			marker.bindPopup(city.name);
+			const marker = L.marker([city.lat, city.lon], {
+				icon: L.icon({
+					iconUrl: 'marker.png',
+					iconSize: [30, 40],
+					iconAnchor: [15, 40],
+					popupAnchor: [0, -40]
+				})
+			});
+			marker.bindPopup(city.name, { closeButton: false });
 			m.push(marker);
 		}
 		return m;
@@ -40,6 +47,7 @@
 		markers;
 		if (map) {
 			addMarkers();
+			map.setView([51, 10.5], L.Browser.mobile ? 5.5 : 6);
 		}
 	});
 	onMount(() => {
@@ -49,9 +57,9 @@
 
 	function initMap() {
 		map = L.map(mapElement, {
-			center: [51.558, 10.141],
-			zoom: 6.2,
-			dragging: !L.Browser.mobile
+			center: [51, 10.5],
+			zoomSnap: 0.5,
+			zoom: L.Browser.mobile ? 5.5 : 6
 		}).addLayer(
 			L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
 				// maxZoom: 10,
@@ -61,36 +69,25 @@
 			})
 		);
 	}
-
-	// async function calculateAndAddPolyline() {
-	// 	await new Promise((resolve) => setTimeout(resolve, 1000));
-
-	// 	const points: salesman.Point[] = cities.map((city) => {
-	// 		return new salesman.Point(city.lat, city.lon);
-	// 	});
-
-	// 	const solution: number[] = await new Promise<number[]>((resolve) =>
-	// 		setTimeout(() => resolve(salesman.solve(points, 0.999)), 0)
-	// 	);
-
-	// 	polyline = solution.map((i) => [points[i].x, points[i].y]);
-
-	// 	L.polyline(polyline).addTo(map);
-	// }
 </script>
-
-<!-- {JSON.stringify(cities)} -->
 
 <Header {data}></Header>
 <div class="h-3"></div>
-
 <div class="aspect-[4/5] w-full rounded-xl" bind:this={mapElement}></div>
-
+<div class="h-1"></div>
+<p class="text-muted-foreground font-mono text-xs">Only showing the biggest 100 cities.</p>
 <div class="h-3"></div>
 <div class="">
 	<p class="text-3xl">
+		{#if !data.prefix && !data.infix && !data.suffix}
+			All {data.coordinate_count} cities<a href="#explainer">*</a>:
+		{/if}
 		{cities.map(({ name }) => name).join(', ')}
 	</p>
 </div>
+<div class="h-3"></div>
+<p id="explainer" class="text-muted-foreground font-mono text-xs">
+	*that I found the coordinates for
+</p>
 <div class="h-24"></div>
 <Footer />

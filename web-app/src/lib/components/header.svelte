@@ -3,7 +3,6 @@
 	import { page } from '$app/state';
 	import Button from './ui/button/button.svelte';
 	import { Input } from './ui/input';
-	import mag from '$lib/assets/mag.png';
 	import finger from '$lib/assets/finger.png';
 	import happy from '$lib/assets/happy.png';
 	import sad from '$lib/assets/sad.png';
@@ -23,28 +22,29 @@
 		};
 	} = $props();
 
-	let prefix = $state(page.data.prefix.toLowerCase());
-	let infix = $state(page.data.infix.toLowerCase());
-	let suffix = $state(page.data.suffix.toLowerCase());
+	let prefix = $state(page.data.prefix);
+	let infix = $state(page.data.infix);
+	let suffix = $state(page.data.suffix);
 
 	$effect(() => {
-		prefix = data.prefix.toLowerCase();
-		infix = data.infix.toLowerCase();
-		suffix = data.suffix.toLowerCase();
+		prefix = data.prefix;
+		infix = data.infix;
+		suffix = data.suffix;
 	});
 
 	let search: boolean = $derived(data.prefix === '' && data.infix === '' && data.suffix === '');
 
 	function new_search() {
+		if (!prefix && !infix && !suffix) return;
 		let query = page.url.searchParams;
 		if (prefix) {
-			query.set('prefix', prefix.toLowerCase());
+			query.set('prefix', prefix.trim().toLowerCase());
 		}
 		if (infix) {
-			query.set('infix', infix.toLowerCase());
+			query.set('infix', infix.trim().toLowerCase());
 		}
 		if (suffix) {
-			query.set('suffix', suffix.toLowerCase());
+			query.set('suffix', suffix.trim().toLowerCase());
 		}
 		goto(`${page.url.origin}?${query.toString()}`);
 	}
@@ -73,17 +73,17 @@
 			{#if data.pro}
 				<img src={finger} class="h-9" alt="finger pointing right" />
 				<p class="text-3xl">prefix</p>
-				<Input bind:value={prefix} type="text" class="w-28" />
+				<Input bind:value={prefix} type="text" class="w-36" />
 			{/if}
 			{#if data.pro}
 				<img src={finger} class="h-9" alt="finger pointing right" />
 				<p class="text-3xl">infix</p>
 			{/if}
-			<Input bind:value={infix} type="text" class="w-28" />
+			<Input bind:value={infix} type="text" class="w-36" />
 			{#if data.pro}
 				<img src={finger} class="h-9" alt="finger pointing right" />
 				<p class="text-3xl">suffix</p>
-				<Input bind:value={suffix} type="text" class="w-28" />
+				<Input bind:value={suffix} type="text" class="w-36" />
 			{/if}
 
 			<Button variant="ghost" type="submit" class="p-0 underline">search</Button>
@@ -104,7 +104,7 @@
 
 			{data.cities.length} out of {data.coordinate_count} german cit{data.cities.length == 1
 				? 'y'
-				: 'ies'}
+				: 'ies'}<a href="#explainer">*</a>
 
 			{#if data.prefix && data.pro}
 				start{data.cities.length == 1 ? 's' : ''} with "{data.prefix}"
@@ -125,9 +125,6 @@
 			{#if data.suffix && data.pro}
 				end{data.cities.length == 1 ? 's' : ''} with "{data.suffix}"
 			{/if}
-			{#if data.cities.length > 100}
-				(only showing the biggest 100 cities)
-			{/if}
 			{#if data.cities.length > 0}
 				<img src={happy} class="inline-block h-9" alt="happy face" />
 			{:else}
@@ -135,6 +132,7 @@
 			{/if}
 			new search:
 			{@render simple_search()}
+			or
 			{@render pro_search()}
 		</p>
 	{/if}

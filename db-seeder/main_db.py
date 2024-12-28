@@ -1,3 +1,4 @@
+import json
 import os
 import requests
 import requests_cache
@@ -11,7 +12,10 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+RESULT_FILE_PATH = "../web-app/src/lib/assets/cities.json"
 
+
+# was only an idea during dev, now using main_json.py to not be dependent on a db
 def get_env_var(key: str, default: Optional[str] = None) -> str:
     value = os.getenv(key)
     if not value and default is None:
@@ -31,7 +35,8 @@ class City:
 def main() -> None:
     cities: List[City] = parse_cities_from_sheet()
     add_coordinates(cities)
-    insert_into_db(cities)
+    write_to_json(cities)
+    # insert_into_db(cities)
 
 
 def parse_cities_from_sheet() -> List[City]:
@@ -80,6 +85,25 @@ def get_lat_lon(
         return None, None
 
 
+def write_to_json(cities: List[City]) -> None:
+    cities = list(
+        map(
+            lambda city: {
+                "name": city.name,
+                "description": city.description,
+                "lat": city.lat,
+                "lon": city.lon,
+            },
+            cities,
+        )
+    )
+    with open(RESULT_FILE_PATH, "w") as fp:
+        json.dump(cities, fp)
+
+    logger.info(f"Created file at: {RESULT_FILE_PATH}")
+
+
+# was only an idea during dev, now using main_json.py to not be dependent on a db
 def insert_into_db(cities: List[City]) -> None:
     headers: dict[str, str] = {
         "Authorization": f"Bearer {get_env_var('TURSO_AUTH_TOKEN')}",

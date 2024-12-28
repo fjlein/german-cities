@@ -1,12 +1,10 @@
 import type { LayoutLoad } from './$types';
+import c from '$lib/assets/cities.json';
 
 export const load = (async () => {
-	const res = await fetch(`/api/cities`);
-	const {
-		cities,
-		full_count,
-		coordinate_count
-	}: { cities: City[]; full_count: number; coordinate_count: number } = await res.json();
+	const cities = c as City[];
+	const full_count = cities.length;
+	const coordinate_count = cities.filter((city) => city.lat && city.lon).length;
 
 	return { cities, full_count, coordinate_count };
 }) satisfies LayoutLoad;
