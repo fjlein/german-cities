@@ -6,7 +6,6 @@
 	import finger from '$lib/assets/finger.png';
 	import happy from '$lib/assets/happy.png';
 	import sad from '$lib/assets/sad.png';
-	import { blur, fade, scale } from 'svelte/transition';
 
 	let {
 		data
@@ -49,6 +48,16 @@
 		goto(`${page.url.origin}?${query.toString()}`);
 	}
 </script>
+
+<svelte:head>
+	<title>All German Cities</title>
+	<meta property="og:title" content="Check out this search!" />
+	<meta property="og:type" content="website" />
+	<meta
+		property="og:description"
+		content="Only {data.cities.length} out of {data.coordinate_count} cities are left!"
+	/>
+</svelte:head>
 
 {#snippet simple_search()}
 	<a href="/" class="text-3xl underline underline-offset-2">simple</a>
@@ -102,9 +111,7 @@
 				<img src={sad} class="inline-block h-9" alt="sad face" />
 			{/if}
 
-			{data.cities.length} out of {data.coordinate_count} german cit{data.cities.length == 1
-				? 'y'
-				: 'ies'}<a href="#explainer">*</a>
+			{data.cities.length} out of {data.coordinate_count} german cities<a href="#explainer">*</a>
 
 			{#if data.prefix && data.pro}
 				start{data.cities.length == 1 ? 's' : ''} with "{data.prefix}"

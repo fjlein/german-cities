@@ -75,7 +75,9 @@
 <div class="h-3"></div>
 <div class="aspect-[4/5] w-full rounded-xl" bind:this={mapElement}></div>
 <div class="h-1"></div>
-<p class="text-muted-foreground font-mono text-xs">Only showing the biggest 100 cities.</p>
+<p class="text-muted-foreground font-mono text-xs">
+	Only showing the biggest 100 cities on the map.
+</p>
 <div class="h-3"></div>
 <div class="">
 	<p class="text-3xl">
@@ -87,7 +89,7 @@
 </div>
 <div class="h-3"></div>
 <p id="explainer" class="text-muted-foreground font-mono text-xs">
-	*that I found the coordinates for
+	*that I found the coordinates for.
 </p>
 <div class="h-24"></div>
 <Footer />
