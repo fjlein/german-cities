@@ -36,6 +36,7 @@
 	function new_search() {
 		if (!prefix && !infix && !suffix) return;
 		let query = page.url.searchParams;
+		query.delete('search');
 		if (prefix) {
 			query.set('prefix', prefix.trim().toLowerCase());
 		}
@@ -113,23 +114,23 @@
 
 			{data.cities.length} out of {data.coordinate_count} german cities<a href="#explainer">*</a>
 
-			{#if data.prefix && data.pro}
+			{#if data.prefix}
 				start{data.cities.length == 1 ? 's' : ''} with "{data.prefix}"
 			{/if}
-			{#if data.prefix && data.infix && data.pro}
+			{#if data.prefix && data.infix}
 				and
 			{/if}
 			{#if data.infix}
 				contain{data.cities.length == 1 ? 's' : ''}
 				"{data.infix}"
 			{/if}
-			{#if data.infix && data.suffix && data.pro}
+			{#if data.infix && data.suffix}
 				and
 			{/if}
-			{#if data.prefix && data.suffix && !data.infix && data.pro}
+			{#if data.prefix && data.suffix && !data.infix}
 				and
 			{/if}
-			{#if data.suffix && data.pro}
+			{#if data.suffix}
 				end{data.cities.length == 1 ? 's' : ''} with "{data.suffix}"
 			{/if}
 			{#if data.cities.length > 0}
